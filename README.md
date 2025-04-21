@@ -18,7 +18,9 @@
 
 
 🧪 Запуск тестов
-mvn clean test
+1. mvn clean test
+2. mvn clean test verify (если есть проблемы с запуском и Jacoco не формируется)
+
 
 
 ✅ Результаты

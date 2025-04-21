@@ -1,5 +1,6 @@
 package tests;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,9 +10,6 @@ import praktikum.Ingredient;
 import praktikum.IngredientType;
 
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class AvailableIngredientsTest {
@@ -47,26 +45,34 @@ public class AvailableIngredientsTest {
         ingredients = new Database().availableIngredients();
     }
 
-    private Ingredient getIngredientByIndex() {
-        assertTrue("Индекс выходит за пределы списка ингредиентов", index < ingredients.size());
-        return ingredients.get(index);
+    @Test
+    public void testAvailableIngredientProperties() {
+        SoftAssertions softly = new SoftAssertions();
+
+        softly.assertThat(index)
+                .as("Индекс %d выходит за пределы списка (размер: %d)", index, ingredients.size())
+                .isLessThan(ingredients.size());
+
+        if (index < ingredients.size()) {
+            Ingredient actualIngredient = ingredients.get(index);
+
+            softly.assertThat(actualIngredient.getType())
+                    .as("Тип ингредиента по индексу %d", index)
+                    .isEqualTo(expectedType);
+
+            softly.assertThat(actualIngredient.getName())
+                    .as("Название ингредиента по индексу %d", index)
+                    .isEqualTo(expectedName);
+
+            softly.assertThat(actualIngredient.getPrice())
+                    .as("Цена ингредиента по индексу %d", index)
+                    .isCloseTo(expectedPrice, within(0.01f));
+        }
+
+        softly.assertAll();
     }
 
-    @Test
-    public void testAvailableIngredientType() {
-        Ingredient actualIngredient = getIngredientByIndex();
-        assertEquals(expectedType, actualIngredient.getType());
-    }
-
-    @Test
-    public void testAvailableIngredientName() {
-        Ingredient actualIngredient = getIngredientByIndex();
-        assertEquals(expectedName, actualIngredient.getName());
-    }
-
-    @Test
-    public void testAvailableIngredientPrice() {
-        Ingredient actualIngredient = getIngredientByIndex();
-        assertEquals(expectedPrice, actualIngredient.getPrice(), 0.01f);
+    private static org.assertj.core.data.Offset<Float> within(float value) {
+        return org.assertj.core.data.Offset.offset(value);
     }
 }

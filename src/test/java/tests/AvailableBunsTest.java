@@ -1,5 +1,6 @@
 package tests;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,9 +9,6 @@ import praktikum.Bun;
 import praktikum.Database;
 
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class AvailableBunsTest {
@@ -45,16 +43,33 @@ public class AvailableBunsTest {
     }
 
     @Test
-    public void testAvailableBunName() {
-        assertTrue("Список булочек меньше, чем ожидалось", buns.size() > index);
-        Bun actualBun = buns.get(index);
-        assertEquals(expectedName, actualBun.getName());
+    public void testAvailableBunProperties() {
+        SoftAssertions softly = new SoftAssertions();
+
+        // Проверка, что список не пуст и содержит нужный индекс
+        softly.assertThat(buns.size())
+                .as("Список булочек должен содержать индекс %d", index)
+                .isGreaterThan(index);
+
+        if (buns.size() > index) {
+            Bun actualBun = buns.get(index);
+
+            // Проверка имени булочки
+            softly.assertThat(actualBun.getName())
+                    .as("Имя булочки по индексу %d", index)
+                    .isEqualTo(expectedName);
+
+            // Проверка цены булочки
+            softly.assertThat(actualBun.getPrice())
+                    .as("Цена булочки по индексу %d", index)
+                    .isCloseTo(expectedPrice, within(0.01f));
+        }
+
+        softly.assertAll();
     }
 
-    @Test
-    public void testAvailableBunPrice() {
-        assertTrue("Список булочек меньше, чем ожидалось", buns.size() > index);
-        Bun actualBun = buns.get(index);
-        assertEquals(expectedPrice, actualBun.getPrice(), 0.01f);
+    // Хелпер для assertJ, чтобы не импортировать вручную
+    private static org.assertj.core.data.Offset<Float> within(float value) {
+        return org.assertj.core.data.Offset.offset(value);
     }
 }

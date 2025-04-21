@@ -1,29 +1,44 @@
 package tests;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import praktikum.Bun;
 
-import static org.junit.Assert.assertEquals;
-
 public class BunTest {
 
-    private static final String TEST_BUN_NAME = "Some bun";
-
-    // Проверяет, что метод корректно возвращает название булочки.
     @Test
-    public void testGetName() {
-        Bun bun = new Bun(TEST_BUN_NAME, 500f);
-        String expectedName = TEST_BUN_NAME;
-        String actualName = bun.getName();
-        assertEquals(expectedName, actualName);
+    public void testBunWithEmptyNameAndZeroPrice() {
+        Bun bun = new Bun("", 0f);
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(bun.getName())
+                .as("Имя булочки должно быть пустой строкой")
+                .isEqualTo("");
+
+        softly.assertThat(bun.getPrice())
+                .as("Цена булочки должна быть 0.0")
+                .isCloseTo(0f, within(0.01f));
+
+        softly.assertAll();
     }
 
-    // Проверяет, что метод корректно возвращает цену булочки.
     @Test
-    public void testGetPrice() {
-        Bun bun = new Bun(TEST_BUN_NAME, 600f);
-        float expectedPrice = 600f;
-        float actualPrice = bun.getPrice();
-        assertEquals(expectedPrice, actualPrice, 0.01f);
+    public void testBunWithNegativePrice() {
+        Bun bun = new Bun("Negative Bun", -100f);
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(bun.getName())
+                .as("Имя булочки должно быть 'Negative Bun'")
+                .isEqualTo("Negative Bun");
+
+        softly.assertThat(bun.getPrice())
+                .as("Цена булочки должна быть -100.0")
+                .isCloseTo(-100f, within(0.01f));
+
+        softly.assertAll();
+    }
+
+    private static org.assertj.core.data.Offset<Float> within(float value) {
+        return org.assertj.core.data.Offset.offset(value);
     }
 }

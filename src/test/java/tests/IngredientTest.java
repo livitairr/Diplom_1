@@ -1,48 +1,70 @@
 package tests;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import praktikum.Ingredient;
 import praktikum.IngredientType;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static praktikum.IngredientType.FILLING;
-import static praktikum.IngredientType.SAUCE;
 
 public class IngredientTest {
 
     @Test
-    public void testGetPrice() {
+    public void testGetPriceReturnsCorrectValue() {
         Ingredient ingredient = new Ingredient(FILLING, "some ingredient", 500f);
-        float expectedPrice = 500f;
-        assertEquals(expectedPrice, ingredient.getPrice(), 0.01f);
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(ingredient.getPrice())
+                .as("Цена ингредиента должна быть 500.0")
+                .isCloseTo(500f, within(0.01f));
+        softly.assertAll();
     }
 
     @Test
-    public void testGetName() {
+    public void testGetNameReturnsCorrectValue() {
         Ingredient ingredient = new Ingredient(FILLING, "some ingredient", 600f);
-        String expectedName = "some ingredient";
-        assertEquals(expectedName, ingredient.getName());
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(ingredient.getName())
+                .as("Имя ингредиента должно быть 'some ingredient'")
+                .isEqualTo("some ingredient");
+        softly.assertAll();
     }
 
     @Test
-    public void testGetType() {
+    public void testGetTypeReturnsCorrectType() {
         Ingredient ingredient = new Ingredient(FILLING, "some ingredient", 400f);
-        IngredientType expectedType = FILLING;
-        assertEquals(expectedType, ingredient.getType());
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(ingredient.getType())
+                .as("Тип ингредиента должен быть FILLING")
+                .isEqualTo(FILLING);
+        softly.assertAll();
     }
 
-
     @Test
-    public void testZeroPrice() {
+    public void testZeroPriceIsAccepted() {
         Ingredient ingredient = new Ingredient(FILLING, "free topping", 0f);
-        assertEquals(0f, ingredient.getPrice(), 0.01f);
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(ingredient.getPrice())
+                .as("Цена должна быть 0.0 для бесплатного ингредиента")
+                .isCloseTo(0f, within(0.01f));
+        softly.assertAll();
     }
 
     @Test
-    public void testEmptyName() {
+    public void testEmptyNameIsAccepted() {
         Ingredient ingredient = new Ingredient(FILLING, "", 100f);
-        assertEquals("", ingredient.getName());
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(ingredient.getName())
+                .as("Имя ингредиента может быть пустым")
+                .isEqualTo("");
+        softly.assertAll();
     }
 
+    private static org.assertj.core.data.Offset<Float> within(float value) {
+        return org.assertj.core.data.Offset.offset(value);
+    }
 }
